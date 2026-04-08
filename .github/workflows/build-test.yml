@@ -19,6 +19,7 @@ jobs:
       MIX_ENV: dev
     container:
       image: ${{ inputs.container-image }}
+      options: --user root
     steps:
       - uses: actions/checkout@v4
 
