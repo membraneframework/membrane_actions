@@ -1,11 +1,8 @@
 name: Use Build Cache
-description: |
+description: >-
   Restores the _build/<env> directory from cache.
-  Exposes the cache key as an output so callers can save the cache after compilation:
-    - uses: actions/cache/save@v4
-      with:
-        path: _build/<env>
-        key: ${{ steps.<id>.outputs.cache-key }}
+  Exposes cache-key and cache-hit outputs. To save after compilation,
+  call actions/cache/save@v4 with path _build/<env> and key from the cache-key output.
 
 inputs:
   cache-version:
