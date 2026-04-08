@@ -19,5 +19,5 @@ runs:
           v${{ inputs.cache-version }}-mix-deps-
 
     - name: Get dependencies
-      shell: bash
+      shell: bash -l {0}
       run: mix deps.get
