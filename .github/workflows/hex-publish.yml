@@ -26,7 +26,6 @@ jobs:
       MIX_ENV: dev
     container:
       image: ${{ inputs.container-image }}
-      options: --user root
       env:
         ASDF_DATA_DIR: /root/.asdf
     steps:

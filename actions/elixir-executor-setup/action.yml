@@ -5,5 +5,5 @@ runs:
   using: composite
   steps:
     - name: Install hex and rebar
-      shell: bash -l {0}
+      shell: bash
       run: mix local.hex --force && mix local.rebar --force

@@ -11,16 +11,16 @@ runs:
   using: composite
   steps:
     - name: Ensure PLTs directory exists
-      shell: bash -l {0}
+      shell: bash
       run: mkdir -p priv/plts
 
     - name: Get Erlang version
-      shell: bash -l {0}
+      shell: bash
       run: |
         erl -eval '{ok, Version} = file:read_file(filename:join([code:root_dir(), "releases", erlang:system_info(otp_release), "OTP_VERSION"])), io:fwrite(Version), halt().' -noshell > .runtime_version
 
     - name: Get Elixir version
-      shell: bash -l {0}
+      shell: bash
       run: elixir --version >> .runtime_version
 
     - name: Restore PLT cache
@@ -33,5 +33,5 @@ runs:
           v${{ inputs.cache-version }}-dialyzer-
 
     - name: Run dialyzer type analysis
-      shell: bash -l {0}
+      shell: bash
       run: mix dialyzer
