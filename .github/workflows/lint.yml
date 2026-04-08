@@ -7,14 +7,10 @@ on:
         description: Increment to force cache recreation
         type: number
         default: 1
-      executor:
-        description: Docker executor to use - 'docker_membrane' or 'elixir'
+      container-image:
+        description: Docker image to run the job in (e.g. elixir:1.18 or membraneframeworklabs/docker_membrane:latest)
         type: string
-        default: docker_membrane
-      executor-version:
-        description: Docker image tag for the chosen executor
-        type: string
-        default: latest
+        default: membraneframeworklabs/docker_membrane:latest
       credo:
         description: Enable Credo static analysis
         type: boolean
@@ -34,15 +30,11 @@ jobs:
     env:
       MIX_ENV: dev
     container:
-      image: >-
-        ${{ inputs.executor == 'elixir'
-            && format('elixir:{0}', inputs.executor-version)
-            || format('membraneframeworklabs/docker_membrane:{0}', inputs.executor-version) }}
+      image: ${{ inputs.container-image }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Elixir executor setup
-        if: inputs.executor == 'elixir'
         uses: ./actions/elixir-executor-setup
 
       - name: Ensure priv dir exists

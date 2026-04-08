@@ -51,11 +51,10 @@ jobs:
   lint:
     uses: membraneframework/membrane-actions-claude/.github/workflows/lint.yml@main
     with:
-      dialyzer: false       # disable Dialyzer
-      docs: false           # disable docs check
-      cache-version: 2      # bust all caches
-      executor: elixir      # use plain elixir image instead of docker_membrane
-      executor-version: '1.18'
+      dialyzer: false                  # disable Dialyzer
+      docs: false                      # disable docs check
+      cache-version: 2                 # bust all caches
+      container-image: elixir:1.18    # use plain elixir image instead of docker_membrane
 ```
 
 ### Publishing to hex.pm
@@ -117,8 +116,7 @@ jobs:
 | Input | Type | Default | Description |
 |---|---|---|---|
 | `cache-version` | number | `1` | Increment to bust all caches |
-| `executor` | string | `docker_membrane` | `docker_membrane` or `elixir` |
-| `executor-version` | string | `latest` | Docker image tag |
+| `container-image` | string | `membraneframeworklabs/docker_membrane:latest` | Full Docker image reference |
 
 ### lint workflow additional inputs
 
@@ -141,12 +139,16 @@ jobs:
 |---|---|---|---|
 | `version` | string | required | GitHub release tag (e.g. `v1.2.3`) |
 
-## Executors
+## Container Images
 
-| Value | Docker Image | When to use |
-|---|---|---|
-| `docker_membrane` (default) | `membraneframeworklabs/docker_membrane:<version>` | Projects using native Membrane multimedia libs |
-| `elixir` | `elixir:<version>` | Pure Elixir projects without native deps |
+Pass any Docker image via `container-image`. Common choices:
+
+| Image | When to use |
+|---|---|
+| `membraneframeworklabs/docker_membrane:latest` (default) | Projects using native Membrane multimedia libs |
+| `membraneframeworklabs/docker_membrane:1.2.3` | Pin to a specific version |
+| `elixir:1.18` | Pure Elixir projects without native deps |
+| `elixir:latest` | Always the latest Elixir release |
 
 ## Secrets
 
