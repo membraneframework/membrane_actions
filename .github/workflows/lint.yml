@@ -47,7 +47,6 @@ jobs:
           cache-version: ${{ inputs.cache-version }}
 
       - name: Restore build cache
-        id: build-cache
         uses: membraneframework-labs/membrane-actions/actions/use-build-cache@main
         with:
           cache-version: ${{ inputs.cache-version }}
@@ -55,13 +54,6 @@ jobs:
 
       - name: Compile
         run: mix compile
-
-      - name: Save build cache
-        if: steps.build-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: _build/dev
-          key: ${{ steps.build-cache.outputs.cache-key }}
 
       - name: Check code formatting
         run: mix format --check-formatted

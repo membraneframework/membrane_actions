@@ -1,8 +1,7 @@
 name: Use Build Cache
 description: >-
-  Restores the _build/<env> directory from cache.
-  Exposes cache-key and cache-hit outputs. To save after compilation,
-  call actions/cache/save@v4 with path _build/<env> and key from the cache-key output.
+  Restores and saves the _build/<env> directory using actions/cache.
+  The cache is saved automatically at the end of the job as a post-step.
 
 inputs:
   cache-version:
@@ -15,25 +14,16 @@ inputs:
     default: dev
 
 outputs:
-  cache-key:
-    description: The cache key to use when saving the build cache
-    value: ${{ steps.compute-key.outputs.key }}
   cache-hit:
     description: Whether an exact cache hit occurred
-    value: ${{ steps.restore.outputs.cache-hit }}
+    value: ${{ steps.cache.outputs.cache-hit }}
 
 runs:
   using: composite
   steps:
-    - name: Compute cache key
-      id: compute-key
-      shell: bash
-      run: |
-        echo "key=v${{ inputs.cache-version }}-build-${{ runner.arch }}-${{ inputs.env }}-${{ hashFiles('mix.lock') }}" >> $GITHUB_OUTPUT
-
-    - name: Restore build cache
-      id: restore
-      uses: actions/cache/restore@v4
+    - name: Restore and save build cache
+      id: cache
+      uses: actions/cache@v4
       with:
         path: _build/${{ inputs.env }}
-        key: ${{ steps.compute-key.outputs.key }}
+        key: v${{ inputs.cache-version }}-build-${{ runner.arch }}-${{ inputs.env }}-${{ hashFiles('mix.lock') }}
