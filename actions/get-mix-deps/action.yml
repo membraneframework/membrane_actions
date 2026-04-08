@@ -14,7 +14,7 @@ runs:
       shell: bash
       run: |
         if [ -n "${ASDF_DATA_DIR}" ]; then
-          for tool in erlang elixir; do
+          for tool in erlang elixir rust; do
             version=$(ls "${ASDF_DATA_DIR}/installs/${tool}/" 2>/dev/null | sort -V | tail -1)
             [ -n "$version" ] && echo "${tool} ${version}" >> "${HOME}/.tool-versions"
           done
