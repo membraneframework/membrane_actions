@@ -10,6 +10,16 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Write asdf tool versions for GitHub Actions HOME
+      shell: bash
+      run: |
+        if [ -n "${ASDF_DATA_DIR}" ]; then
+          for tool in erlang elixir; do
+            version=$(ls "${ASDF_DATA_DIR}/installs/${tool}/" 2>/dev/null | sort -V | tail -1)
+            [ -n "$version" ] && echo "${tool} ${version}" >> "${HOME}/.tool-versions"
+          done
+        fi
+
     - name: Restore dependencies cache
       uses: actions/cache@v4
       with:
