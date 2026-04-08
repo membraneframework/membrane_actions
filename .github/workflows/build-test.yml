@@ -23,19 +23,19 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Elixir executor setup
-        uses: ./actions/elixir-executor-setup
+        uses: membraneframework-labs/membrane-actions/actions/elixir-executor-setup@main
 
       - name: Ensure priv dir exists
         run: mkdir -p priv
 
       - name: Get mix dependencies
-        uses: ./actions/get-mix-deps
+        uses: membraneframework-labs/membrane-actions/actions/get-mix-deps@main
         with:
           cache-version: ${{ inputs.cache-version }}
 
       - name: Restore build cache
         id: build-cache
-        uses: ./actions/use-build-cache
+        uses: membraneframework-labs/membrane-actions/actions/use-build-cache@main
         with:
           cache-version: ${{ inputs.cache-version }}
           env: dev
