@@ -47,6 +47,7 @@ jobs:
         run: mix compile --force --warnings-as-errors
 
       - name: Save build cache
+        if: steps.build-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
           path: _build/dev

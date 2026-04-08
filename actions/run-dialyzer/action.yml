@@ -24,7 +24,7 @@ runs:
       run: elixir --version >> .runtime_version
 
     - name: Restore PLT cache
-      uses: actions/cache/restore@v4
+      uses: actions/cache@v4
       with:
         path: priv/plts
         key: v${{ inputs.cache-version }}-dialyzer-${{ hashFiles('.runtime_version') }}-${{ hashFiles('mix.lock') }}
@@ -35,9 +35,3 @@ runs:
     - name: Run dialyzer type analysis
       shell: bash
       run: mix dialyzer
-
-    - name: Save PLT cache
-      uses: actions/cache/save@v4
-      with:
-        path: priv/plts
-        key: v${{ inputs.cache-version }}-dialyzer-${{ hashFiles('.runtime_version') }}-${{ hashFiles('mix.lock') }}
