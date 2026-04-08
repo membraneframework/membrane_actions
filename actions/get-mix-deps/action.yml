@@ -18,10 +18,6 @@ runs:
         restore-keys: |
           v${{ inputs.cache-version }}-mix-deps-
 
-    - name: Remove unused deps from cache
-      shell: bash
-      run: mix deps.clean --unused
-
     - name: Get dependencies
       shell: bash
       run: mix deps.get
