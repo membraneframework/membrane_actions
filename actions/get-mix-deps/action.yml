@@ -1,0 +1,27 @@
+name: Get Mix Dependencies
+description: Gets mix dependencies, using a cache keyed on mix.lock.
+
+inputs:
+  cache-version:
+    description: Increment to force cache recreation
+    required: false
+    default: '1'
+
+runs:
+  using: composite
+  steps:
+    - name: Restore dependencies cache
+      uses: actions/cache@v4
+      with:
+        path: deps
+        key: v${{ inputs.cache-version }}-mix-deps-${{ hashFiles('mix.lock') }}
+        restore-keys: |
+          v${{ inputs.cache-version }}-mix-deps-
+
+    - name: Remove unused deps from cache
+      shell: bash
+      run: mix deps.clean --unused
+
+    - name: Get dependencies
+      shell: bash
+      run: mix deps.get

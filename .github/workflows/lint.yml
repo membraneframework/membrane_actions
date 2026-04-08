@@ -1,0 +1,87 @@
+name: Lint (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      cache-version:
+        description: Increment to force cache recreation
+        type: number
+        default: 1
+      executor:
+        description: Docker executor to use - 'docker_membrane' or 'elixir'
+        type: string
+        default: docker_membrane
+      executor-version:
+        description: Docker image tag for the chosen executor
+        type: string
+        default: latest
+      credo:
+        description: Enable Credo static analysis
+        type: boolean
+        default: true
+      docs:
+        description: Check that docs generate without warnings
+        type: boolean
+        default: true
+      dialyzer:
+        description: Enable Dialyzer type checking
+        type: boolean
+        default: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    env:
+      MIX_ENV: dev
+    container:
+      image: >-
+        ${{ inputs.executor == 'elixir'
+            && format('elixir:{0}', inputs.executor-version)
+            || format('membraneframeworklabs/docker_membrane:{0}', inputs.executor-version) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Elixir executor setup
+        if: inputs.executor == 'elixir'
+        uses: ./actions/elixir-executor-setup
+
+      - name: Ensure priv dir exists
+        run: mkdir -p priv
+
+      - name: Get mix dependencies
+        uses: ./actions/get-mix-deps
+        with:
+          cache-version: ${{ inputs.cache-version }}
+
+      - name: Restore build cache
+        id: build-cache
+        uses: ./actions/use-build-cache
+        with:
+          cache-version: ${{ inputs.cache-version }}
+          env: dev
+
+      - name: Compile
+        run: mix compile
+
+      - name: Save build cache
+        uses: actions/cache/save@v4
+        with:
+          path: _build/dev
+          key: ${{ steps.build-cache.outputs.cache-key }}
+
+      - name: Check code formatting
+        run: mix format --check-formatted
+
+      - name: Run Credo linter
+        if: inputs.credo == true
+        run: mix credo
+
+      - name: Check docs for warnings
+        if: inputs.docs == true
+        run: mix docs && mix docs 2>&1 | (! grep -q "warning:")
+
+      - name: Run Dialyzer
+        if: inputs.dialyzer == true
+        uses: ./actions/run-dialyzer
+        with:
+          cache-version: ${{ inputs.cache-version }}

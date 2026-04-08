@@ -1,0 +1,43 @@
+name: Run Dialyzer
+description: Runs dialyzer type analysis. Caches PLT files keyed on Erlang/Elixir versions and mix.lock.
+
+inputs:
+  cache-version:
+    description: Increment to force PLT cache recreation
+    required: false
+    default: '1'
+
+runs:
+  using: composite
+  steps:
+    - name: Ensure PLTs directory exists
+      shell: bash
+      run: mkdir -p priv/plts
+
+    - name: Get Erlang version
+      shell: bash
+      run: |
+        erl -eval '{ok, Version} = file:read_file(filename:join([code:root_dir(), "releases", erlang:system_info(otp_release), "OTP_VERSION"])), io:fwrite(Version), halt().' -noshell > .runtime_version
+
+    - name: Get Elixir version
+      shell: bash
+      run: elixir --version >> .runtime_version
+
+    - name: Restore PLT cache
+      uses: actions/cache/restore@v4
+      with:
+        path: priv/plts
+        key: v${{ inputs.cache-version }}-dialyzer-${{ hashFiles('.runtime_version') }}-${{ hashFiles('mix.lock') }}
+        restore-keys: |
+          v${{ inputs.cache-version }}-dialyzer-${{ hashFiles('.runtime_version') }}-
+          v${{ inputs.cache-version }}-dialyzer-
+
+    - name: Run dialyzer type analysis
+      shell: bash
+      run: mix dialyzer
+
+    - name: Save PLT cache
+      uses: actions/cache/save@v4
+      with:
+        path: priv/plts
+        key: v${{ inputs.cache-version }}-dialyzer-${{ hashFiles('.runtime_version') }}-${{ hashFiles('mix.lock') }}

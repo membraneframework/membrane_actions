@@ -1,0 +1,9 @@
+name: Elixir Executor Setup
+description: Installs hex and rebar. Required when using the plain elixir Docker image (not needed for docker_membrane which already has them).
+
+runs:
+  using: composite
+  steps:
+    - name: Install hex and rebar
+      shell: bash
+      run: mix local.hex --force && mix local.rebar --force

@@ -1,0 +1,20 @@
+name: Precompile macOS Intel (Deprecated, No-op)
+
+on:
+  workflow_call:
+    inputs:
+      package-name:
+        description: Name of the package (kept for API compatibility)
+        type: string
+        required: true
+      expected-version:
+        description: Expected version (kept for API compatibility)
+        type: string
+        default: 'no check'
+
+jobs:
+  precompile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skip precompilation
+        run: echo 'Intel-based macOS resources deprecated, skipping'

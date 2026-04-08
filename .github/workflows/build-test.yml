@@ -1,0 +1,64 @@
+name: Build and Test (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      cache-version:
+        description: Increment to force cache recreation
+        type: number
+        default: 1
+      executor:
+        description: Docker executor to use - 'docker_membrane' or 'elixir'
+        type: string
+        default: docker_membrane
+      executor-version:
+        description: Docker image tag for the chosen executor
+        type: string
+        default: latest
+
+jobs:
+  build_test:
+    runs-on: ubuntu-latest
+    env:
+      MIX_ENV: dev
+    container:
+      image: >-
+        ${{ inputs.executor == 'elixir'
+            && format('elixir:{0}', inputs.executor-version)
+            || format('membraneframeworklabs/docker_membrane:{0}', inputs.executor-version) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Elixir executor setup
+        if: inputs.executor == 'elixir'
+        uses: ./actions/elixir-executor-setup
+
+      - name: Ensure priv dir exists
+        run: mkdir -p priv
+
+      - name: Get mix dependencies
+        uses: ./actions/get-mix-deps
+        with:
+          cache-version: ${{ inputs.cache-version }}
+
+      - name: Restore build cache
+        id: build-cache
+        uses: ./actions/use-build-cache
+        with:
+          cache-version: ${{ inputs.cache-version }}
+          env: dev
+
+      - name: Compile dependencies
+        run: mix deps.compile
+
+      - name: Compile with warnings as errors
+        run: mix compile --force --warnings-as-errors
+
+      - name: Save build cache
+        uses: actions/cache/save@v4
+        with:
+          path: _build/dev
+          key: ${{ steps.build-cache.outputs.cache-key }}
+
+      - name: Check for unused dependencies
+        run: mix deps.unlock --check-unused

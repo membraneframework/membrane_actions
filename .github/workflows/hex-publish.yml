@@ -1,0 +1,56 @@
+name: Hex Publish (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      cache-version:
+        description: Increment to force cache recreation
+        type: number
+        default: 1
+      executor:
+        description: Docker executor to use - 'docker_membrane' or 'elixir'
+        type: string
+        default: docker_membrane
+      executor-version:
+        description: Docker image tag for the chosen executor
+        type: string
+        default: latest
+    secrets:
+      HEX_API_KEY:
+        required: true
+
+jobs:
+  hex_publish:
+    runs-on: ubuntu-latest
+    env:
+      MIX_ENV: dev
+    container:
+      image: >-
+        ${{ inputs.executor == 'elixir'
+            && format('elixir:{0}', inputs.executor-version)
+            || format('membraneframeworklabs/docker_membrane:{0}', inputs.executor-version) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Elixir executor setup
+        if: inputs.executor == 'elixir'
+        uses: ./actions/elixir-executor-setup
+
+      - name: Get mix dependencies
+        uses: ./actions/get-mix-deps
+        with:
+          cache-version: ${{ inputs.cache-version }}
+
+      - name: Restore build cache
+        uses: ./actions/use-build-cache
+        with:
+          cache-version: ${{ inputs.cache-version }}
+          env: dev
+
+      - name: Ensure priv dir exists
+        run: mkdir -p priv
+
+      - name: Publish to hex.pm
+        run: mix hex.publish --yes
+        env:
+          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}

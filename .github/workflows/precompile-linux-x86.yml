@@ -1,0 +1,39 @@
+name: Precompile Linux x86 (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      package-name:
+        description: Name of the Homebrew package to precompile
+        type: string
+        required: true
+      expected-version:
+        description: Expected package version (e.g. v1.2.3). Set to 'no check' to skip version validation.
+        type: string
+        default: 'no check'
+
+jobs:
+  precompile:
+    runs-on: ubuntu-latest
+    env:
+      PACKAGE_NAME: ${{ inputs.package-name }}
+      EXPECTED_VERSION: ${{ inputs.expected-version }}
+      ARCHITECTURE: x86
+      WORKSPACE_DIR: ${{ github.workspace }}/workspace
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Precompile package for Linux x86
+        run: bash scripts/precompile_for_linux.sh
+
+      - name: Upload Linux x86 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.package-name }}_linux_x86
+          path: ${{ github.workspace }}/workspace/${{ inputs.package-name }}_linux_x86
+
+      - name: Upload generic Linux artifact (backwards compatibility)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.package-name }}_linux
+          path: ${{ github.workspace }}/workspace/${{ inputs.package-name }}_linux
