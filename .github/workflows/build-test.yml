@@ -11,10 +11,6 @@ on:
         description: Docker image to run the job in (e.g. elixir:1.18 or membraneframeworklabs/docker_membrane:latest)
         type: string
         default: membraneframeworklabs/docker_membrane:latest
-      install-hex-rebar:
-        description: Run mix local.hex and mix local.rebar before mix commands. Required for plain elixir images; not needed for docker_membrane which already includes them.
-        type: boolean
-        default: false
 
 jobs:
   build_test:
@@ -27,7 +23,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Elixir executor setup
-        if: inputs.install-hex-rebar == true
+        if: startsWith(inputs.container-image, 'elixir')
         uses: membraneframework-labs/membrane-actions/actions/elixir-executor-setup@main
 
       - name: Ensure priv dir exists
