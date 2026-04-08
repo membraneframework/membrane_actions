@@ -11,9 +11,13 @@ on:
         description: Docker image to run the job in (e.g. elixir:1.18 or membraneframeworklabs/docker_membrane:latest)
         type: string
         default: membraneframeworklabs/docker_membrane:latest
+      dry_run:
+        description: Build the package with mix hex.build without publishing. Useful for validating the package in CI.
+        type: boolean
+        default: false
     secrets:
       HEX_API_KEY:
-        required: true
+        required: false
 
 jobs:
   hex_publish:
@@ -42,7 +46,12 @@ jobs:
       - name: Ensure priv dir exists
         run: mkdir -p priv
 
+      - name: Build package (dry run)
+        if: inputs.dry_run == true
+        run: mix hex.build
+
       - name: Publish to hex.pm
+        if: inputs.dry_run == false
         run: mix hex.publish --yes
         env:
           HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
