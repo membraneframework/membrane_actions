@@ -32,6 +32,8 @@ jobs:
     container:
       image: ${{ inputs.container-image }}
       options: --user root
+      env:
+        ASDF_DATA_DIR: /root/.asdf
     steps:
       - uses: actions/checkout@v4
 
