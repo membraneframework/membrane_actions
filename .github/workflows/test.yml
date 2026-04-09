@@ -29,18 +29,18 @@ jobs:
 
       - name: Elixir executor setup
         if: startsWith(inputs.container-image, 'elixir')
-        uses: membraneframework-labs/membrane-actions/actions/elixir-executor-setup@main
+        uses: membraneframework/membrane_actions/actions/elixir-executor-setup@main
 
       - name: Ensure priv dir exists
         run: mkdir -p priv
 
       - name: Get mix dependencies
-        uses: membraneframework-labs/membrane-actions/actions/get-mix-deps@main
+        uses: membraneframework/membrane_actions/actions/get-mix-deps@main
         with:
           cache-version: ${{ inputs.cache-version }}
 
       - name: Restore build cache
-        uses: membraneframework-labs/membrane-actions/actions/use-build-cache@main
+        uses: membraneframework/membrane_actions/actions/use-build-cache@main
         with:
           cache-version: ${{ inputs.cache-version }}
           env: test
