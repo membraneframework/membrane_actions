@@ -1,4 +1,4 @@
-# membrane-actions-claude
+# Membrane Actions
 
 GitHub Actions reusable workflows and composite actions for [Membrane Framework](https://membraneframework.org) Elixir projects. This is the GitHub Actions equivalent of the [`membraneframework/circleci-orb`](https://github.com/membraneframework/circleci-orb).
 
@@ -35,13 +35,13 @@ on:
 
 jobs:
   build_test:
-    uses: membraneframework/membrane-actions-claude/.github/workflows/build-test.yml@main
+    uses: membraneframework/membrane_actions/.github/workflows/build-test.yml@main
 
   test:
-    uses: membraneframework/membrane-actions-claude/.github/workflows/test.yml@main
+    uses: membraneframework/membrane_actions/.github/workflows/test.yml@main
 
   lint:
-    uses: membraneframework/membrane-actions-claude/.github/workflows/lint.yml@main
+    uses: membraneframework/membrane_actions/.github/workflows/lint.yml@main
 ```
 
 ### Customizing inputs
@@ -49,7 +49,7 @@ jobs:
 ```yaml
 jobs:
   lint:
-    uses: membraneframework/membrane-actions-claude/.github/workflows/lint.yml@main
+    uses: membraneframework/membrane_actions/.github/workflows/lint.yml@main
     with:
       dialyzer: false                  # disable Dialyzer
       docs: false                      # disable docs check
@@ -62,7 +62,7 @@ jobs:
 ```yaml
 jobs:
   hex_publish:
-    uses: membraneframework/membrane-actions-claude/.github/workflows/hex-publish.yml@main
+    uses: membraneframework/membrane_actions/.github/workflows/hex-publish.yml@main
     secrets:
       HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
     # Or pass all secrets automatically:
@@ -84,26 +84,26 @@ on:
 
 jobs:
   precompile_linux_x86:
-    uses: membraneframework/membrane-actions-claude/.github/workflows/precompile-linux-x86.yml@main
+    uses: membraneframework/membrane_actions/.github/workflows/precompile-linux-x86.yml@main
     with:
       package-name: my_package
       expected-version: ${{ github.ref_name }}
 
   precompile_linux_arm:
-    uses: membraneframework/membrane-actions-claude/.github/workflows/precompile-linux-arm.yml@main
+    uses: membraneframework/membrane_actions/.github/workflows/precompile-linux-arm.yml@main
     with:
       package-name: my_package
       expected-version: ${{ github.ref_name }}
 
   precompile_macos_arm:
-    uses: membraneframework/membrane-actions-claude/.github/workflows/precompile-macos-arm.yml@main
+    uses: membraneframework/membrane_actions/.github/workflows/precompile-macos-arm.yml@main
     with:
       package-name: my_package
       expected-version: ${{ github.ref_name }}
 
   publish:
     needs: [precompile_linux_x86, precompile_linux_arm, precompile_macos_arm]
-    uses: membraneframework/membrane-actions-claude/.github/workflows/publish-precompiled.yml@main
+    uses: membraneframework/membrane_actions/.github/workflows/publish-precompiled.yml@main
     with:
       version: ${{ github.ref_name }}
     secrets: inherit
