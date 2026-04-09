@@ -55,6 +55,6 @@ jobs:
 
       - name: Publish to hex.pm
         if: inputs.dry_run == false
-        run: echo mix hex.publish --yes
+        run: mix hex.publish --yes
         env:
           HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
