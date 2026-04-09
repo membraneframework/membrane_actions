@@ -12,6 +12,9 @@ on:
         type: string
         default: membraneframeworklabs/docker_membrane:latest
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest

@@ -19,6 +19,9 @@ on:
       HEX_API_KEY:
         required: false
 
+permissions:
+  contents: read
+
 jobs:
   hex_publish:
     runs-on: ubuntu-latest

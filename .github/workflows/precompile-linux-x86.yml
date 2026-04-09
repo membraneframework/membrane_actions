@@ -12,6 +12,9 @@ on:
         type: string
         default: 'no check'
 
+permissions:
+  contents: read
+
 jobs:
   precompile:
     runs-on: ubuntu-latest
