@@ -13,7 +13,7 @@ runs:
     - name: Write asdf tool versions for GitHub Actions HOME
       shell: bash
       run: |
-        if [ -n "${ASDF_DATA_DIR}" ]; then
+        if [ -n "${ASDF_DATA_DIR}" ] && [ -d "${ASDF_DATA_DIR}/installs" ]; then
           for tool_dir in "${ASDF_DATA_DIR}/installs"/*/; do
             tool=$(basename "${tool_dir}")
             version=$(ls "${tool_dir}" 2>/dev/null | sort -V | tail -1)
