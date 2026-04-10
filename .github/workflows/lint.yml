@@ -11,6 +11,10 @@ on:
         description: Docker image to run the job in (e.g. elixir:1.18 or membraneframeworklabs/docker_membrane:latest)
         type: string
         default: membraneframeworklabs/docker_membrane:latest
+      submodules:
+        description: Whether to checkout submodules (true, false, or recursive)
+        type: string
+        default: "false"
       credo:
         description: Enable Credo static analysis
         type: boolean
@@ -38,6 +42,8 @@ jobs:
         ASDF_DATA_DIR: /root/.asdf
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: ${{ inputs.submodules }}
 
       - name: Elixir executor setup
         if: startsWith(inputs.container-image, 'elixir')
