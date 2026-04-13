@@ -15,6 +15,10 @@ on:
         description: Whether to checkout submodules (true, false, or recursive)
         type: string
         default: "false"
+      test-flags:
+        description: Additional flags to pass to mix test (e.g. "--include long_running")
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -55,4 +59,4 @@ jobs:
         run: mix deps.compile
 
       - name: Run tests
-        run: mix test --warnings-as-errors
+        run: mix test --warnings-as-errors ${{ inputs.test-flags }}
