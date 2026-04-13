@@ -19,13 +19,31 @@ on:
         description: Flags to pass to mix test
         type: string
         default: "--warnings-as-errors"
+      shards:
+        description: Number of parallel test shards
+        type: number
+        default: 1
 
 permissions:
   contents: read
 
 jobs:
-  test:
+  generate_matrix:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: |
+          echo "matrix=$(python3 -c "import json; print(json.dumps(list(range(1, ${{ inputs.shards }} + 1))))")" >> $GITHUB_OUTPUT
+
+  test:
+    needs: generate_matrix
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJSON(needs.generate_matrix.outputs.matrix) }}
     env:
       MIX_ENV: test
     container:
@@ -59,4 +77,10 @@ jobs:
         run: mix deps.compile
 
       - name: Run tests
-        run: mix test ${{ inputs.test-flags }}
+        run: |
+          if [ "${{ inputs.shards }}" -gt 1 ]; then
+            TEST_FILES=$(find test -name "*.exs" | sort | awk "NR % ${{ inputs.shards }} == (${{ matrix.shard }} - 1)")
+            mix test ${{ inputs.test-flags }} $TEST_FILES
+          else
+            mix test ${{ inputs.test-flags }}
+          fi
