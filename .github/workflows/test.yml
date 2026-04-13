@@ -16,9 +16,9 @@ on:
         type: string
         default: "false"
       test-flags:
-        description: Additional flags to pass to mix test (e.g. "--include long_running")
+        description: Flags to pass to mix test
         type: string
-        default: ""
+        default: "--warnings-as-errors"
 
 permissions:
   contents: read
@@ -59,4 +59,4 @@ jobs:
         run: mix deps.compile
 
       - name: Run tests
-        run: mix test --warnings-as-errors ${{ inputs.test-flags }}
+        run: mix test ${{ inputs.test-flags }}
