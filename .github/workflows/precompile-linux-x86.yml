@@ -26,8 +26,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Checkout membrane_actions
+        uses: actions/checkout@v4
+        with:
+          repository: membraneframework/membrane_actions
+          path: _membrane_actions
+
       - name: Precompile package for Linux x86
-        run: bash scripts/precompile_for_linux.sh
+        run: bash _membrane_actions/scripts/precompile_for_linux.sh
 
       - name: Upload Linux x86 artifact
         uses: actions/upload-artifact@v4

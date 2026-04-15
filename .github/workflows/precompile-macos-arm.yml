@@ -26,8 +26,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Checkout membrane_actions
+        uses: actions/checkout@v4
+        with:
+          repository: membraneframework/membrane_actions
+          path: _membrane_actions
+
       - name: Precompile package for macOS ARM
-        run: bash scripts/precompile_for_macos.sh
+        run: bash _membrane_actions/scripts/precompile_for_macos.sh
 
       - name: Upload macOS ARM artifact
         uses: actions/upload-artifact@v4

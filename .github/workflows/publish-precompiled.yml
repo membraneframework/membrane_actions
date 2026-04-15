@@ -20,12 +20,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Checkout membrane_actions
+        uses: actions/checkout@v4
+        with:
+          repository: membraneframework/membrane_actions
+          path: _membrane_actions
+
       - name: Download all precompiled artifacts
         uses: actions/download-artifact@v4
         with:
           path: ${{ github.workspace }}/workspace
 
       - name: Publish release
-        run: bash scripts/publish_precompiled.sh
+        run: bash _membrane_actions/scripts/publish_precompiled.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
