@@ -51,9 +51,6 @@ jobs:
           cache-version: ${{ inputs.cache-version }}
           env: dev
 
-      - name: Compile dependencies
-        run: mix deps.compile
-
       - name: Compile with warnings as errors
         run: mix compile --force --warnings-as-errors
 

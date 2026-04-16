@@ -19,6 +19,10 @@ on:
         description: Flags to pass to mix test
         type: string
         default: "--warnings-as-errors"
+      force-compile:
+        description: Run mix compile --force before tests (useful when deps require a forced recompile)
+        type: boolean
+        default: false
       shards:
         description: Number of parallel test shards
         type: number
@@ -73,8 +77,13 @@ jobs:
           cache-version: ${{ inputs.cache-version }}
           env: test
 
-      - name: Compile dependencies
-        run: mix deps.compile
+      - name: Compile
+        run: |
+          if [ "${{ inputs.force-compile }}" = "true" ]; then
+            mix compile --force
+          else
+            mix compile
+          fi
 
       - name: Run tests
         run: |
