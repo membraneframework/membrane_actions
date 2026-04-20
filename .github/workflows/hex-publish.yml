@@ -18,7 +18,7 @@ on:
       dry_run:
         description: Build the package with mix hex.build without publishing. Useful for validating the package in CI.
         type: boolean
-        default: false
+        default: true
     secrets:
       HEX_API_KEY:
         required: false
@@ -58,9 +58,14 @@ jobs:
       - name: Ensure priv dir exists
         run: mkdir -p priv
 
-      - name: Build package (dry run)
-        if: inputs.dry_run == true
+      - name: Build package
         run: mix hex.build
+
+      - name: Publish to hex.pm (dry run)
+        if: inputs.dry_run == true
+        run: mix hex.publish --dry-run
+        env:
+          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
 
       - name: Publish to hex.pm
         if: inputs.dry_run == false
