@@ -18,7 +18,7 @@ on:
       dry_run:
         description: Build the package with mix hex.build without publishing. Useful for validating the package in CI.
         type: boolean
-        default: true
+        default: false
     secrets:
       HEX_API_KEY:
         required: false

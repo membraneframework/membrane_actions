@@ -15,6 +15,11 @@ on:
         description: Whether to checkout submodules (true, false, or recursive)
         type: string
         default: "false"
+      setup-commands:
+        description: Commands to run before checkout
+        type: string
+        default: ""
+        required: false
 
 permissions:
   contents: read
@@ -29,6 +34,10 @@ jobs:
       env:
         ASDF_DATA_DIR: /root/.asdf
     steps:
+      - name: Run setup commands
+        if: inputs.setup-commands != ''
+        run: ${{ inputs.setup-commands }}
+
       - uses: actions/checkout@v4
         with:
           submodules: ${{ inputs.submodules }}
