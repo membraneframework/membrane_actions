@@ -1,0 +1,90 @@
+name: GitHub Release
+
+on:
+  workflow_call:
+    inputs:
+      name:
+        description: Release name (defaults to tag name)
+        required: false
+        type: string
+        default: ''
+      body:
+        description: Release body (markdown)
+        required: false
+        type: string
+        default: ''
+      generate-notes:
+        description: Whether to auto-generate release notes when body is not provided
+        required: false
+        type: boolean
+        default: true
+      prerelease:
+        description: Whether this is a prerelease
+        required: false
+        type: boolean
+        default: false
+      draft:
+        description: Whether this is a draft release
+        required: false
+        type: boolean
+        default: false
+      make-latest:
+        description: Whether to set this as the latest release
+        required: false
+        type: boolean
+        default: true
+      include-assets:
+        description: Whether to include repo archives (zip and tar.gz) as release assets
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create assets
+        if: inputs.include-assets == true
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          if [ -z "$TAG_NAME" ]; then
+            exit 0
+          fi
+          REPO_NAME=${GITHUB_REPOSITORY#*/}
+          zip -r "${REPO_NAME}-${TAG_NAME}.zip" . -x "*.git*" ".github/*" ".git/*" "*.zip" "*.tar.gz" > /dev/null 2>&1 || true
+          tar --exclude=".git" --exclude=".github" -czf "${REPO_NAME}-${TAG_NAME}.tar.gz" . > /dev/null 2>&1 || true
+          echo "zip-asset=${REPO_NAME}-${TAG_NAME}.zip" >> $GITHUB_OUTPUT
+          echo "tar-asset=${REPO_NAME}-${TAG_NAME}.tar.gz" >> $GITHUB_OUTPUT
+        id: assets
+
+      - name: Create Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          if [ -z "$TAG_NAME" ]; then
+            echo "Error: Not running on a tag. GITHUB_REF=$GITHUB_REF"
+            exit 1
+          fi
+          GH_ARGS=("$TAG_NAME")
+          [ -n "${{ inputs.name }}" ] && GH_ARGS+=(--title "${{ inputs.name }}")
+          [ -n "${{ inputs.body }}" ] && GH_ARGS+=(--notes "${{ inputs.body }}")
+          [ "${{ inputs.generate-notes }}" = "true" ] && [ -z "${{ inputs.body }}" ] && GH_ARGS+=(--generate-notes)
+          [ "${{ inputs.prerelease }}" = "true" ] && GH_ARGS+=(--prerelease)
+          [ "${{ inputs.draft }}" = "true" ] && GH_ARGS+=(--draft)
+          [ "${{ inputs.prerelease }}" = "false" ] && GH_ARGS+=(--latest="${{ inputs.make-latest }}")
+          gh release create "${GH_ARGS[@]}"
+
+      - name: Upload assets
+        if: inputs.include-assets == true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          [ -f "${{ steps.assets.outputs.zip-asset }}" ] && gh release upload "$TAG_NAME" "${{ steps.assets.outputs.zip-asset }}" --clobber
+          [ -f "${{ steps.assets.outputs.tar-asset }}" ] && gh release upload "$TAG_NAME" "${{ steps.assets.outputs.tar-asset }}" --clobber
+          rm -f "${{ steps.assets.outputs.zip-asset }}" "${{ steps.assets.outputs.tar-asset }}"
