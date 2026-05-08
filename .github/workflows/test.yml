@@ -23,6 +23,10 @@ on:
         description: Run mix compile --force before tests (useful when deps require a forced recompile)
         type: boolean
         default: false
+      cache-build:
+        description: Whether to restore the build cache
+        type: boolean
+        default: true
       shards:
         description: Number of parallel test shards
         type: number
@@ -85,6 +89,7 @@ jobs:
           cache-version: ${{ inputs.cache-version }}
 
       - name: Restore build cache
+        if: inputs.cache-build == true
         uses: membraneframework/membrane_actions/actions/use-build-cache@main
         with:
           cache-version: ${{ inputs.cache-version }}
