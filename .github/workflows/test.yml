@@ -19,10 +19,6 @@ on:
         description: Flags to pass to mix test
         type: string
         default: "--warnings-as-errors"
-      force-compile:
-        description: Run mix compile --force before tests (useful when deps require a forced recompile)
-        type: boolean
-        default: false
       cache-build:
         description: Whether to restore the build cache
         type: boolean
@@ -97,11 +93,7 @@ jobs:
 
       - name: Compile
         run: |
-          if [ "${{ inputs.force-compile }}" = "true" ]; then
-            mix compile --force
-          else
-            mix compile
-          fi
+            MIX_ENV=test mix compile --force
 
       - name: Run tests
         run: |

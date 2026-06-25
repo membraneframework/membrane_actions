@@ -73,7 +73,7 @@ jobs:
           env: dev
 
       - name: Compile
-        run: mix compile
+        run: mix compile -f
 
       - name: Check code formatting
         run: mix format --check-formatted
