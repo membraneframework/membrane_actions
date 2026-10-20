@@ -42,7 +42,12 @@ for l in "$(brew --prefix)"/Cellar/*/*/lib/*.dylib; do
 
     # update the LC_ID_DYLIB command of current library so that it's name is a relative path,
     # not absolute (as brew sets it), so that it can be located during linking
-    install_name_tool -id "@rpath/$(basename $f)" $f
+
+    # The filename might differ from the name recorded in LC_ID_DYLIB, so we use the latter.
+    # This is to keep consistent with the dependencies listed by `otool -L`, so when dyld
+    # loads a library and then has to load it again through a dependent library, it uses the same name.
+    f_id=$(otool -D "$f" | tail -1)
+    install_name_tool -id "@rpath/$(basename $f_id)" $f
     # update the LC_LOAD_DYLIB commands that refer to dependencies of current library that have been
     # installed by brew and set as local paths so that their names are also relative paths and the dependencies can be located during linking
     otool -L $f | tail -n +3 | awk -F" " '{print $1}' | (grep -E "^($(brew --prefix)|@loader_path)" || [ "$?" == "1" ]) | while read -r line; do install_name_tool -change $line "@rpath/$(basename $line)" $f; done
