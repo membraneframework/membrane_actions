@@ -70,6 +70,7 @@ jobs:
 
       - uses: actions/checkout@v4
         with:
+          persist-credentials: false
           submodules: ${{ inputs.submodules }}
 
       - name: Elixir executor setup
