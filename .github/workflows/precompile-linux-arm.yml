@@ -25,10 +25,13 @@ jobs:
       WORKSPACE_DIR: ${{ github.workspace }}/workspace
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Checkout membrane_actions
         uses: actions/checkout@v4
         with:
+          persist-credentials: false
           repository: membraneframework/membrane_actions
           path: _membrane_actions
 
